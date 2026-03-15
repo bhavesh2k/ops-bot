@@ -1,0 +1,9 @@
+pypdf
+python-docx
+pandas
+openpyxl
+tqdm
+chromadb
+sentence-transformers
+rank-bm25
+ollama
