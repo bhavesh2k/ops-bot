@@ -1,8 +1,20 @@
+import os
+os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+
+from transformers.utils import logging
+logging.set_verbosity_error()
+
+from pathlib import Path
 import json
 import chromadb
 from sentence_transformers import SentenceTransformer, CrossEncoder
 from rank_bm25 import BM25Okapi
 
+
+BASE_DIR = Path(__file__).resolve().parents[1]
+CHUNKS_PATH = BASE_DIR / "output" / "knowledge_chunks.json"
+VECTOR_DB_PATH = BASE_DIR / "vector_db"
 
 _model = None
 _reranker = None
@@ -40,7 +52,7 @@ def load_knowledge():
 
         print("Loading knowledge chunks...")
 
-        with open(r"C:\Users\320175878\Downloads\ops_bot\output\knowledge_chunks.json") as f:
+        with open(CHUNKS_PATH, encoding="utf-8") as f:
             _chunks = json.load(f)
 
         _documents = [c["content"] for c in _chunks]
@@ -61,7 +73,7 @@ def get_vector_collection():
         print("Loading vector DB...")
 
         chroma_client = chromadb.PersistentClient(
-            path=r"C:\Users\320175878\Downloads\ops_bot\vector_db"
+            path=str(VECTOR_DB_PATH)
         )
 
         _collection = chroma_client.get_collection("ops_knowledge")

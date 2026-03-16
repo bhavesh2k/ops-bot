@@ -1,4 +1,5 @@
 import ollama
+from pathlib import Path
 from vector.hybrid_search import hybrid_search
 import time
 import datetime
@@ -48,7 +49,8 @@ If a SQL query appears in the documentation that answers the question, return th
 # logging helper function
 def log_query(question, status, sources):
 
-    log_dir = "logs"
+    BASE_DIR = Path(__file__).resolve().parents[1]
+    log_dir = BASE_DIR / "logs"
     log_file = os.path.join(log_dir, "queries.log")
 
     os.makedirs(log_dir, exist_ok=True)

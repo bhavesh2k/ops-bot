@@ -1,8 +1,16 @@
 import json
 import os
+from pathlib import Path
 from extract_docs import load_documents
 from tqdm import tqdm
 import re
+
+
+BASE_DIR = Path(__file__).resolve().parents[1]
+RAW_DOCS_PATH = BASE_DIR / "data" / "raw_docs"
+OUTPUT_PATH = BASE_DIR / "output"
+CHUNKS_FILE = OUTPUT_PATH / "knowledge_chunks.json"
+
 
 def clean_text(text):
 
@@ -59,7 +67,7 @@ def chunk_text(text, chunk_size=500, overlap=100):
 
 def build_knowledge_chunks():
 
-    docs = load_documents(r"C:\Users\320175878\Downloads\ops_bot\data\raw_docs")
+    docs = load_documents(str(RAW_DOCS_PATH))
     knowledge_chunks = []
 
     for doc in tqdm(docs):
@@ -71,9 +79,9 @@ def build_knowledge_chunks():
                 "content": chunk
             })
 
-    os.makedirs(r"C:\Users\320175878\Downloads\ops_bot\output", exist_ok=True)
+    os.makedirs(OUTPUT_PATH, exist_ok=True)
 
-    with open(r"C:\Users\320175878\Downloads\ops_bot\output\knowledge_chunks.json", "w") as f:
+    with open(CHUNKS_FILE, "w", encoding="utf-8") as f:
         json.dump(knowledge_chunks, f, indent=2)
 
     print(f"\nCreated {len(knowledge_chunks)} knowledge chunks")
