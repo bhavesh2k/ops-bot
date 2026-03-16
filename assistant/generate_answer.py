@@ -1,10 +1,11 @@
 import ollama
 from vector.hybrid_search import hybrid_search
 import time
+import datetime
+import os
 
-
+# warm up model
 print("Warming up model...")
-
 ollama.chat(
     model="mistral",
     messages=[{"role": "user", "content": "Hello"}],
@@ -14,10 +15,7 @@ ollama.chat(
 print("Model ready.\n")
 
 
-# --------------------------------------------------
-# PROMPT BUILDER
-# --------------------------------------------------
-
+# prompt builder
 def build_prompt(question, results):
 
     context = "\n\n".join([doc for doc, src in results])
@@ -44,8 +42,23 @@ Rules:
 Important:
 If a SQL query appears in the documentation that answers the question, return that SQL query.
 """
-
     return prompt
+
+
+# logging helper function
+def log_query(question, status, sources):
+
+    log_dir = "logs"
+    log_file = os.path.join(log_dir, "queries.log")
+
+    os.makedirs(log_dir, exist_ok=True)
+
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    source_str = ", ".join(sources) if sources else "none"
+
+    with open(log_file, "a", encoding="utf-8") as f:
+        f.write(f"{timestamp} | {question} | {status} | {source_str}\n")
 
 
 # API STREAMING
@@ -56,7 +69,12 @@ def generate_answer_stream_api(question):
     """
     yield "Thinking...\n\n"   # send first token immediately
 
+    answer_text = ""
     results = hybrid_search(question, k=5)
+
+    # handle cases where retrieval finds nothing
+    if not results:
+        sources = []
 
      # Extract unique sources
     sources = list(dict.fromkeys([src for doc, src in results]))
@@ -81,10 +99,19 @@ def generate_answer_stream_api(question):
 
     for chunk in stream:
         token = chunk["message"]["content"]
+        answer_text += token
         yield token
+    
+    # detect and log unanswered questions
+    if "I could not find this information" in answer_text:
+        status = "not_found"
+    else:
+        status = "answered"
+
+    log_query(question, status, sources)
 
 
-# LOCAL DEBUG STREAMING
+# local debug streaming
 def generate_answer_stream_local(question):
     """
     Streaming generator for local CLI use.
