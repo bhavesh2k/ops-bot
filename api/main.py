@@ -1,9 +1,41 @@
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from contextlib import asynccontextmanager
+
 from assistant.generate_answer import generate_answer_stream_api
 
+from vector.model_loader import (
+    get_model,
+    get_reranker,
+    load_knowledge,
+    get_vector_collection
+)
+
 app = FastAPI(title="Ops Bot API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    # Startup logic
+    print("Initializing retrieval system...")
+
+    get_model()
+    get_reranker()
+    load_knowledge()
+    get_vector_collection()
+
+    print("Retrieval system ready.")
+    yield
+
+    # Shutdown logic (optional)
+    print("Shutting down Ops Bot...")
+
+
+app = FastAPI(
+    title="Ops Bot API",
+    lifespan=lifespan
+)
 
 class QuestionRequest(BaseModel):
     question: str

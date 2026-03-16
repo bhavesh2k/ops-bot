@@ -15,7 +15,8 @@ data/
 *.csv
 *.log
 *.pdf
-*.docx*.xlsx
+*.docx
+*.xlsx
 
 # IDE
 .vscode/
