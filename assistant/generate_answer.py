@@ -55,8 +55,17 @@ def generate_answer_stream_api(question):
     Returns tokens only.
     """
     yield "Thinking...\n\n"   # send first token immediately
-    
+
     results = hybrid_search(question, k=5)
+
+     # Extract unique sources
+    sources = list(dict.fromkeys([src for doc, src in results]))
+
+    # Send sources first
+    yield "Sources:\n"
+    for src in sources:
+        yield f"- {src}\n"
+    yield "\nAnswer:\n"
 
     prompt = build_prompt(question, results)
 
