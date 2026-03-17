@@ -139,8 +139,15 @@ def generate_answer_stream_api(question):
         }
     )
 
+    first_token = True
+
     for chunk in stream:
         token = chunk["message"]["content"]
+        
+        if first_token:
+            token = token.lstrip()  # remove leading whitespace from the first token
+            first_token = False
+        
         answer_text += token
         yield token
     
