@@ -46,6 +46,45 @@ If a SQL query appears in the documentation that answers the question, return th
     return prompt
 
 
+# rewrite query for better retrieval
+def rewrite_query(question):
+    """
+    Rewrite user query to improve retrieval.
+    Keeps it short but keyword rich.
+    """
+
+    rewrite_prompt = f"""
+Rewrite the following user query to improve document retrieval.
+
+Make it:
+- more explicit
+- keyword rich
+- suitable for searching technical documentation or SQL examples
+
+User Query:
+{question}
+
+Rewritten Query:
+"""
+
+    response = ollama.chat(
+        model="mistral",
+        messages=[{"role": "user", "content": rewrite_prompt}],
+        options={
+            "num_predict": 40,
+            "temperature": 0
+        }
+    )
+
+    rewritten = response["message"]["content"].strip()
+
+    # fallback safety
+    if not rewritten:
+        return question
+
+    return rewritten
+
+
 # logging helper function
 def log_query(question, status, sources):
 
@@ -72,7 +111,8 @@ def generate_answer_stream_api(question):
     yield "Thinking...\n\n"   # send first token immediately
 
     answer_text = ""
-    results = hybrid_search(question, k=5)
+    rewritten_query = rewrite_query(question)
+    results = hybrid_search(rewritten_query, k=5)
 
     # handle cases where retrieval finds nothing
     if not results:
@@ -125,7 +165,10 @@ def generate_answer_stream_local(question):
     # RETRIEVAL TIMING
     retrieval_start = time.perf_counter()
 
-    results = hybrid_search(question, k=5)
+    # rewrite query and then retreive
+    rewritten_query = rewrite_query(question)
+    print(f"\nRewritten query: {rewritten_query}\n")
+    results = hybrid_search(rewritten_query, k=5)
 
     retrieval_end = time.perf_counter()
     retrieval_time = retrieval_end - retrieval_start
