@@ -112,7 +112,7 @@ def generate_answer_stream_api(question):
 
     answer_text = ""
     rewritten_query = rewrite_query(question)
-    results = hybrid_search(rewritten_query, k=5)
+    results = hybrid_search(question, k=5)
 
     # handle cases where retrieval finds nothing
     if not results:
@@ -125,7 +125,7 @@ def generate_answer_stream_api(question):
     yield "Sources:\n"
     for src in sources:
         yield f"- {src}\n"
-    yield "\nAnswer:\n"
+    yield "Answer:\n"
 
     prompt = build_prompt(question, results)
 

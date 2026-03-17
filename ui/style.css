@@ -1,0 +1,146 @@
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f2f6ff;
+}
+
+.app{
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+}
+
+/* HEADER */
+
+.header{
+    background:#0B5ED7;
+    color:white;
+    padding:16px;
+    font-size:18px;
+    font-weight:600;
+    position: fixed;    /* stick header on top */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* optional shadow */
+}
+
+/* MAIN LAYOUT */
+
+.main {
+    margin-top: 64px; /* match the header's height (16px padding + 32px approx height) */
+}   
+
+/* CHAT AREA */
+
+.chat{
+    flex:3;
+    padding:25px;
+    overflow-y:auto;
+    background:white;
+}
+
+/* SIDEBAR */
+
+.sources{
+    flex:1;
+    border-left:1px solid #ddd;
+    padding:20px;
+    background:#f8fbff;
+}
+
+.sources h3{
+    color:#0B5ED7;
+}
+
+.sources ul{
+    padding-left:20px;
+}
+
+.sources li{
+    margin-bottom:8px;
+}
+
+/* MESSAGE WRAPPER */
+
+.message{
+    display:flex;
+    margin-bottom:20px;
+}
+
+/* USER MESSAGE */
+
+.user-message{
+    justify-content:flex-end;
+}
+
+/* ASSISTANT MESSAGE */
+
+.bot-message{
+    justify-content:flex-start;
+}
+
+/* BUBBLES */
+
+.bubble{
+    max-width:70%;
+    padding:12px 16px;
+    border-radius:14px;
+    line-height:1.5;
+    white-space:pre-wrap;
+}
+
+/* USER BUBBLE */
+
+.user-bubble{
+    background:#0B5ED7;
+    color:white;
+    border-bottom-right-radius:4px;
+}
+
+/* BOT BUBBLE */
+
+.bot-bubble{
+    background:#eef3ff;
+    color:#111;
+    border-bottom-left-radius:4px;
+}
+
+/* THINKING TEXT */
+
+.thinking{
+    font-style:italic;
+    color:#666;
+}
+
+/* INPUT AREA */
+
+.input-area{
+    display:flex;
+    border-top:1px solid #ddd;
+}
+
+input{
+    flex:1;
+    padding:16px;
+    border:none;
+    font-size:16px;
+}
+
+input:focus{
+    outline:none;
+}
+
+button{
+    padding:16px 26px;
+    border:none;
+    background:#0B5ED7;
+    color:white;
+    font-size:15px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#094bb5;
+}

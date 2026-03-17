@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
+
+from pathlib import Path
 
 from assistant.generate_answer import generate_answer_stream_api
 
@@ -12,7 +16,8 @@ from vector.model_loader import (
     get_vector_collection
 )
 
-app = FastAPI(title="Ops Bot API")
+BASE_DIR = Path(__file__).resolve().parents[1]
+UI_DIR = BASE_DIR / "ui"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -29,7 +34,7 @@ async def lifespan(app: FastAPI):
     yield
 
     # Shutdown logic (optional)
-    print("Shutting down Ops Bot...")
+    print("Shutting down OneSpace Service Ops Assistant...")
 
 
 app = FastAPI(
@@ -37,13 +42,21 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+app.mount("/static", StaticFiles(directory=UI_DIR), name="static")
+
 class QuestionRequest(BaseModel):
     question: str
 
 
 @app.get("/")
 def health():
-    return {"status": "Ops Bot running"}
+    return {"status": "OneSpace Service Ops Assistant running"}
+
+
+@app.get("/chat")
+def chat_ui():
+    return FileResponse(UI_DIR / "index.html")
+
 
 # Non-streaming response
 @app.post("/ask")
