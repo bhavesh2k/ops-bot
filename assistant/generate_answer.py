@@ -183,6 +183,7 @@ def generate_answer_stream_local(question):
     prompt_start = time.perf_counter()
 
     prompt = build_prompt(question, results)
+    # print(prompt)
 
     prompt_end = time.perf_counter()
     prompt_time = prompt_end - prompt_start

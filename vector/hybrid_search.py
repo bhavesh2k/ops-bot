@@ -6,7 +6,7 @@ from vector.model_loader import (
 )
 
 
-def hybrid_search(query, k=6):
+def hybrid_search(query, k=5, retrieval_k=25):
 
     model = get_model()
     reranker = get_reranker()
@@ -20,7 +20,7 @@ def hybrid_search(query, k=6):
 
     vector_results = collection.query(
         query_embeddings=[query_embedding.tolist()],
-        n_results=k
+        n_results=retrieval_k
     )
 
     vector_docs = vector_results["documents"][0]
@@ -35,7 +35,7 @@ def hybrid_search(query, k=6):
         range(len(bm25_scores)),
         key=lambda i: bm25_scores[i],
         reverse=True
-    )[:k]
+    )[:retrieval_k]
 
     keyword_docs = [documents[i] for i in top_indices]
     keyword_sources = [chunks[i]["source"] for i in top_indices]
@@ -63,21 +63,21 @@ def hybrid_search(query, k=6):
             results.append((doc, src))
             seen.add(key)
 
-    # BOOST SQL CHUNKS
-    results.sort(
-        key=lambda x: 1 if "select" in x[0].lower() else 0,
-        reverse=True
-    )
 
     # RERANK RESULTS
     pairs = [(query, doc) for doc, _ in results]
 
     scores = reranker.predict(pairs)
+    scored_results = []
+    for (doc, src), score in zip(results, scores):
 
-    scored_results = list(zip(results, scores))
+        # small SQL boost
+        if "select" in doc.lower():
+            score += 0.05
+
+        scored_results.append(((doc, src), score))
 
     scored_results.sort(key=lambda x: x[1], reverse=True)
-
-    reranked = [r[0] for r in scored_results[:5]]
+    reranked = [r[0] for r in scored_results[:k]]
 
     return reranked
