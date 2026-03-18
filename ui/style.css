@@ -2,7 +2,7 @@ body{
     margin:0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
     font-size:16px;
-    background:#f2f6ff;
+    background:#e9edf5;   /* darker light grey instead of very white */
 }
 
 *{
@@ -46,7 +46,7 @@ body{
     flex:3;
     padding:25px;
     overflow-y:auto;
-    background:white;
+    background:f5f7fb;
 }
 
 /* SIDEBAR */
@@ -55,7 +55,7 @@ body{
     flex:1;
     border-left:1px solid #ddd;
     padding:20px;
-    background:#f8fbff;
+    background:#eef2f8;
 }
 
 .sources h3{
@@ -112,7 +112,7 @@ body{
 /* BOT BUBBLE */
 
 .bot-bubble{
-    background:#eef3ff;
+    background:#e4ebff;
     color:#111;
     border-bottom-left-radius:4px;
 }
@@ -135,7 +135,7 @@ body{
     display:flex;
     padding:10px;
     border-top:1px solid #ddd;
-    background:white;
+    background:f4f6fa;
 
     z-index:1000;
 }
@@ -143,9 +143,10 @@ body{
 input{
     flex:1;
     padding:14px;
-    border:1px solid #ddd;
+    border:1px solid #d8dee9;
     border-radius:10px;
     font-size:15px;
+    background:#fafbff;
 }
 
 input:focus{
