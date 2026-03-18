@@ -26,10 +26,10 @@ async function sendQuestion() {
   /* USER MESSAGE */
 
   const userMessage = document.createElement("div");
-  userMessage.className = "message";
+  userMessage.className = "message user";
 
   userMessage.innerHTML = `
-      <div class="bot-icon">🧑</div>
+      <div class="user-icon">🧑‍💻</div>
       <div class="bubble">${question}</div>
   `;
 
