@@ -57,12 +57,15 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  height: 100vh;
 }
 
 /* Message Area */
 .chat-body {
+  flex: 1;
+  overflow-y: auto;
   padding: 50px 60px;
+  scroll-behavior: smooth;
 }
 
 .message {
@@ -99,6 +102,10 @@ body {
 /* Input Area */
 .chat-input {
   padding: 20px 40px 14px;
+  background: var(--light-bg);
+  border-top: 1px solid var(--border);
+  position: sticky;
+  bottom: 0;
 }
 
 .input-wrapper {
