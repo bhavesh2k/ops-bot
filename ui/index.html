@@ -1,37 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>OneSpace Ops Assistant</title>
-    <link rel="stylesheet" href="/static/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operations Assistant</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
 </head>
 
 <body>
 
-<div class="app">
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="logo"><span>PHILIPS</span> OneSpace</div>
 
-    <div class="header">
-        OneSpace Service Ops Assistant
+  <div class="sources-title">SOURCES USED</div>
+  <ul id="sourceList" class="sources-empty">
+    <li>No sources cited yet...</li>
+  </ul>
+</div>
+
+<!-- Chat -->
+<div class="chat-container">
+
+  <!-- Messages -->
+  <div class="chat-body" id="chat">
+    <div class="message">
+      <div class="bot-icon">🤖</div>
+      <div class="bubble">
+        Hello! I'm your Operations Assistant for the Base platform. How can I help you today?
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="chat-input">
+    <div class="input-wrapper">
+      <input id="question" type="text" placeholder="Ask about operations, logistics, or platform status..." />
+      
+      <div class="send-btn">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 12L21 3L14 21L11 13L3 12Z"/>
+        </svg>
+      </div>
     </div>
 
-    <div class="main">
-
-        <div id="chat" class="chat"></div>
-
-        <div id="sources" class="sources">
-            <h3>Sources</h3>
-            <ul id="sourceList"></ul>
-        </div>
-
+    <div class="footer">
+      Base AI may provide inaccurate info. Verify important operational data.
     </div>
-
-    <div class="input-area">
-        <input id="question" placeholder="Ask a question..." />
-        <button onclick="sendQuestion()">Send</button>
-    </div>
+  </div>
 
 </div>
 
 <script src="/static/script.js"></script>
-
 </body>
 </html>
