@@ -46,16 +46,15 @@ body{
     flex:3;
     padding:25px;
     overflow-y:auto;
-    background:f5f7fb;
+    background:#eef2f8;
 }
 
 /* SIDEBAR */
 
 .sources{
     flex:1;
-    border-left:1px solid #ddd;
     padding:20px;
-    background:#eef2f8;
+    background:#f5f7fb;
 }
 
 .sources h3{
@@ -134,8 +133,8 @@ body{
 
     display:flex;
     padding:10px;
-    border-top:1px solid #ddd;
-    background:f4f6fa;
+    
+    background:#eef2f8;
 
     z-index:1000;
 }
@@ -143,7 +142,7 @@ body{
 input{
     flex:1;
     padding:14px;
-    border:1px solid #d8dee9;
+    border:1px solid #e2e8f0;
     border-radius:10px;
     font-size:15px;
     background:#fafbff;
