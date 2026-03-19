@@ -4,6 +4,7 @@ from vector.model_loader import (
     load_knowledge,
     get_vector_collection
 )
+import numpy as np
 
 
 def hybrid_search(query, k=5, retrieval_k=25):
@@ -41,50 +42,70 @@ def hybrid_search(query, k=5, retrieval_k=25):
     keyword_sources = [chunks[i]["source"] for i in top_indices]
 
     # COMBINE RESULTS
-    results = []
-    seen = set()
-
     def normalize(text):
         return " ".join(text.lower().split())
 
-    for doc, src in zip(vector_docs, vector_sources):
+    def rrf_score(rank, k=60):
+        return 1 / (k + rank)
 
+    rrf_scores = {}
+    doc_map = {}
+
+    # VECTOR RESULTS
+    for rank, (doc, src) in enumerate(zip(vector_docs, vector_sources)):
         key = normalize(doc)
 
-        if key not in seen:
-            results.append((doc, src["source"]))
-            seen.add(key)
+        rrf_scores[key] = rrf_scores.get(key, 0) + rrf_score(rank)
+        doc_map[key] = (doc, src["source"])
 
-    for doc, src in zip(keyword_docs, keyword_sources):
-
+    # BM25 RESULTS
+    for rank, (doc, src) in enumerate(zip(keyword_docs, keyword_sources)):
         key = normalize(doc)
 
-        if key not in seen:
-            results.append((doc, src))
-            seen.add(key)
+        rrf_scores[key] = rrf_scores.get(key, 0) + rrf_score(rank)
+        doc_map[key] = (doc, src)
 
+    # SORT BY RRF SCORE
+    ranked_results = sorted(rrf_scores.items(), key=lambda x: x[1], reverse=True)
 
-    # RERANK RESULTS
+    # FINAL MERGED RESULTS
+    results = [doc_map[key] for key, _ in ranked_results]
+
+    # ---------------- RERANK WITH FUSION ----------------
+
+    # Prepare query-doc pairs
     pairs = [(query, doc) for doc, _ in results]
 
-    scores = reranker.predict(pairs)
-    scored_results = []
-    for (doc, src), score in zip(results, scores):
+    # Get reranker scores
+    rerank_scores = reranker.predict(pairs)
 
-        # small SQL boost
-        if all(keyword in doc.lower() for keyword in ("select", "from", "where")):
-            score += 0.05
+    # Normalize (sigmoid)
+    rerank_scores = 1 / (1 + np.exp(-rerank_scores))
 
-        scored_results.append(((doc, src), score))
 
-    scored_results.sort(key=lambda x: x[1], reverse=True)
+    # Combine RRF + reranker
+    final_results = []
 
-    # add relevance threshold
-    THRESHOLD = 0.3
-    filtered = [
-        (doc, src)
-        for (doc, src), score in scored_results
-        if score >= THRESHOLD
-    ]
+    for i, ((doc, src), rerank_score) in enumerate(zip(results, rerank_scores)):
+        key = normalize(doc)
 
-    return filtered[:k]
+        rrf_val = rrf_scores[key]   # <-- RRF score from earlier
+
+        # Combine scores (tunable weights)
+        final_score = 0.7 * rerank_score + 0.3 * rrf_val
+
+        # Optional light SQL boost (keep small, general)
+        if "select" in doc.lower():
+            final_score += 0.03
+
+        final_results.append(((doc, src), final_score))
+
+
+    # Sort final results
+    final_results.sort(key=lambda x: x[1], reverse=True)
+
+
+    # Return top-k directly (NO threshold)
+    print(final_results[:k])
+
+    return [(doc, src) for (doc, src), score in final_results[:k]]
