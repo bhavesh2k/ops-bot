@@ -35,10 +35,11 @@ Question:
 
 Rules:
 1. If the answer exists in the documentation, extract it directly.
-2. If a SQL query exists that answers the question, return the SQL query EXACTLY as written.
-3. Do NOT modify SQL queries.
-4. Do NOT invent information.
-5. If the answer cannot be found in the documentation, say:
+2. Prefer the chunk that most directly answers the question.
+3. If a SQL query exists that answers the question, return the SQL query EXACTLY as written.
+4. Do NOT modify SQL queries.
+5. Do NOT invent information.
+6. If the answer cannot be found in the documentation, say:
 "I could not find this information in the documentation."
 
 Important:
