@@ -48,6 +48,17 @@ async function sendQuestion() {
   chat.appendChild(botMessage);
 
   const botBubble = botMessage.querySelector(".bubble");
+  let hasReceivedFirstToken = false;
+
+  let dots = 0;
+  const thinkingInterval = setInterval(() => {
+    if (hasReceivedFirstToken) {
+      clearInterval(thinkingInterval);
+      return;
+    }
+    dots = (dots + 1) % 4;
+    botBubble.innerText = "Thinking" + ".".repeat(dots);
+  }, 400);
 
   chat.scrollTop = chat.scrollHeight;
 
@@ -63,57 +74,57 @@ async function sendQuestion() {
   const decoder = new TextDecoder();
 
   let buffer = "";
-  let inSources = false;
-  let inAnswer = false;
 
   botBubble.innerText = "";
 
   while (true) {
-
     const { value, done } = await reader.read();
-
     if (done) break;
 
-    const chunk = decoder.decode(value);
-    buffer += chunk;
+    buffer += decoder.decode(value);
 
-    /* SOURCES SECTION */
+    let lines = buffer.split("\n");
 
-    if (buffer.includes("Sources:")) {
-      inSources = true;
-      buffer = buffer.replace("Sources:", "");
-    }
+    // keep last incomplete chunk
+    buffer = lines.pop();
 
-    if (buffer.includes("Answer:")) {
-      inSources = false;
-      inAnswer = true;
-      buffer = buffer.replace("Answer:", "");
-    }
+    for (let line of lines) {
+      if (!line.trim()) continue;
 
-    if (inSources) {
-
-      const lines = buffer.split("\n");
-
-      lines.forEach(line => {
-
-        if (line.trim().startsWith("-")) {
-
-          const li = document.createElement("li");
-          li.innerText = line.replace("-", "").trim();
-
-          sourceList.appendChild(li);
+      try {
+        const event = JSON.parse(line);
+        
+        if (event.type === "thinking") {
+          botBubble.innerText = "Thinking...";
         }
 
-      });
+        if (event.type === "sources") {
+          sourceList.innerHTML = ""; // clear default
 
-      buffer = "";
-    }
+          event.data.forEach(src => {
+            const li = document.createElement("li");
+            li.innerText = src;
+            sourceList.appendChild(li);
+          });
+        }
 
-    /* ANSWER STREAM */
+        if (event.type === "start_answer") {
+          // DO NOTHING yet — keep "Thinking..." visible
+        }
 
-    if (inAnswer) {
-      botBubble.innerText += buffer;
-      buffer = "";
+        if (event.type === "token") {
+          
+          // first token → clear "Thinking..."
+          if (!hasReceivedFirstToken) {
+            botBubble.innerText = "";
+            hasReceivedFirstToken = true;
+          }
+          botBubble.innerText += event.data;
+        }
+
+      } catch (e) {
+        console.error("Parsing error:", e, line);
+      }
     }
 
     chat.scrollTop = chat.scrollHeight;

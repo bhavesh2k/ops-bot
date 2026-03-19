@@ -1,6 +1,7 @@
-import ollama
 from pathlib import Path
 from vector.hybrid_search import hybrid_search
+import json
+import ollama
 import time
 import datetime
 import os
@@ -108,7 +109,9 @@ def generate_answer_stream_api(question):
     Streaming generator for FastAPI endpoint.
     Returns tokens only.
     """
-    yield "Thinking...\n"   # send first token immediately
+    yield json.dumps({
+        "type": "thinking"
+    }) + "\n"
 
     answer_text = ""
     # rewritten_query = rewrite_query(question)
@@ -120,12 +123,17 @@ def generate_answer_stream_api(question):
 
      # Extract unique sources
     sources = list(dict.fromkeys([src for doc, src in results]))
+    
+    # send sources as structured event
+    yield json.dumps({
+        "type": "sources",
+        "data": sources
+    }) + "\n"
 
-    # Send sources first
-    yield "Sources:\n"
-    for src in sources:
-        yield f"- {src}\n"
-    yield "Answer:\n"
+    # start answer stream
+    yield json.dumps({
+        "type": "start_answer"
+    }) + "\n"
 
     prompt = build_prompt(question, results)
 
@@ -149,7 +157,10 @@ def generate_answer_stream_api(question):
             first_token = False
         
         answer_text += token
-        yield token
+        yield json.dumps({
+            "type": "token",
+            "data": token
+        }) + "\n"
     
     # detect and log unanswered questions
     if "I could not find this information" in answer_text:
