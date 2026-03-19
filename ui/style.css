@@ -147,7 +147,7 @@ body {
 
 /* Input Area */
 .chat-input {
-  padding: 20px 40px 14px;
+  padding: 0px 30px 10px;
   background: var(--light-bg);
   
   position: sticky;
