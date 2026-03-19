@@ -42,7 +42,7 @@ async function sendQuestion() {
 
   botMessage.innerHTML = `
       <div class="bot-icon">🤖</div>
-      <div class="bubble">Thinking...</div>
+      <div class="bubble"><span class="thinking">Thinking...</span></div>
   `;
 
   chat.appendChild(botMessage);
@@ -57,7 +57,7 @@ async function sendQuestion() {
       return;
     }
     dots = (dots + 1) % 4;
-    botBubble.innerText = "Thinking" + ".".repeat(dots);
+    botBubble.innerHTML = `<span class="thinking">Thinking${".".repeat(dots)}</span>`;
   }, 400);
 
   chat.scrollTop = chat.scrollHeight;
@@ -75,8 +75,6 @@ async function sendQuestion() {
 
   let buffer = "";
 
-  botBubble.innerText = "";
-
   while (true) {
     const { value, done } = await reader.read();
     if (done) break;
@@ -93,10 +91,6 @@ async function sendQuestion() {
 
       try {
         const event = JSON.parse(line);
-        
-        if (event.type === "thinking") {
-          botBubble.innerText = "Thinking...";
-        }
 
         if (event.type === "sources") {
           sourceList.innerHTML = ""; // clear default
@@ -116,10 +110,10 @@ async function sendQuestion() {
           
           // first token → clear "Thinking..."
           if (!hasReceivedFirstToken) {
-            botBubble.innerText = "";
+            botBubble.innerHTML = "";
             hasReceivedFirstToken = true;
           }
-          botBubble.innerText += event.data;
+          botBubble.innerHTML += event.data;
         }
 
       } catch (e) {

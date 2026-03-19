@@ -73,6 +73,12 @@ body {
   scroll-behavior: smooth;
 }
 
+.thinking {
+  font-style: italic;
+  color: var(--muted);
+  opacity: 0.9;
+}
+
 .message {
   display: flex;
   align-items: flex-start;
