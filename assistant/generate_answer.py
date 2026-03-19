@@ -108,11 +108,11 @@ def generate_answer_stream_api(question):
     Streaming generator for FastAPI endpoint.
     Returns tokens only.
     """
-    yield "Thinking...\n\n"   # send first token immediately
+    yield "Thinking...\n"   # send first token immediately
 
     answer_text = ""
-    rewritten_query = rewrite_query(question)
-    results = hybrid_search(question, k=5)
+    # rewritten_query = rewrite_query(question)
+    results = hybrid_search(question, k=5)  # result contains [(doc, source)]
 
     # handle cases where retrieval finds nothing
     if not results:
