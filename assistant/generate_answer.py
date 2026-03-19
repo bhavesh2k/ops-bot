@@ -184,9 +184,9 @@ def generate_answer_stream_local(question):
     retrieval_start = time.perf_counter()
 
     # rewrite query and then retreive
-    rewritten_query = rewrite_query(question)
-    print(f"\nRewritten query: {rewritten_query}\n")
-    results = hybrid_search(rewritten_query, k=5)
+    # rewritten_query = rewrite_query(question)
+    # print(f"\nRewritten query: {rewritten_query}\n")
+    results = hybrid_search(question, k=5)
 
     retrieval_end = time.perf_counter()
     retrieval_time = retrieval_end - retrieval_start
@@ -237,9 +237,7 @@ def generate_answer_stream_local(question):
             first_token = False
 
         print(token, end="", flush=True)
-
         answer += token
-
         yield token
 
     llm_end = time.perf_counter()
@@ -249,10 +247,7 @@ def generate_answer_stream_local(question):
 
     total_end = time.perf_counter()
 
-    # -----------------------------
     # PERFORMANCE SUMMARY
-    # -----------------------------
-
     print("\n\n---------------- PERFORMANCE ----------------")
 
     print(f"Retrieval time: {retrieval_time:.3f}s")
@@ -266,7 +261,6 @@ def generate_answer_stream_local(question):
     print(f"Total pipeline time: {total_end - total_start:.3f}s")
 
     print("--------------------------------------------\n")
-
 
 
 # --------------------------------------------------
