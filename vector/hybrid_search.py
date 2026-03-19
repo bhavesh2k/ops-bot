@@ -72,12 +72,19 @@ def hybrid_search(query, k=5, retrieval_k=25):
     for (doc, src), score in zip(results, scores):
 
         # small SQL boost
-        if "select" in doc.lower():
+        if all(keyword in doc.lower() for keyword in ("select", "from", "where")):
             score += 0.05
 
         scored_results.append(((doc, src), score))
 
     scored_results.sort(key=lambda x: x[1], reverse=True)
-    reranked = [r[0] for r in scored_results[:k]]
 
-    return reranked
+    # add relevance threshold
+    THRESHOLD = 0.3
+    filtered = [
+        (doc, src)
+        for (doc, src), score in scored_results
+        if score >= THRESHOLD
+    ]
+
+    return filtered[:k]

@@ -119,7 +119,10 @@ def generate_answer_stream_api(question):
 
     # handle cases where retrieval finds nothing
     if not results:
-        sources = []
+        yield '{"type":"sources","data":[]}\n'
+        yield '{"type":"start_answer"}\n'
+        yield '{"type":"token","data":"I could not find this information in the documentation."}\n'
+        return
 
      # Extract unique sources
     sources = list(dict.fromkeys([src for doc, src in results]))
@@ -187,6 +190,11 @@ def generate_answer_stream_local(question):
     # rewritten_query = rewrite_query(question)
     # print(f"\nRewritten query: {rewritten_query}\n")
     results = hybrid_search(question, k=5)
+
+    if not results:
+        print('Sources - NA\n')
+        print('I could not find this information in the documentation.\n')        
+        return
 
     retrieval_end = time.perf_counter()
     retrieval_time = retrieval_end - retrieval_start
