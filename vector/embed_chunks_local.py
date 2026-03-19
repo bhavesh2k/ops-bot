@@ -18,7 +18,13 @@ chroma_client = chromadb.PersistentClient(
     path=str(VECTOR_DB_PATH)
 )
 
-collection = chroma_client.get_or_create_collection(
+try:
+    chroma_client.delete_collection(name="ops_knowledge")
+    print("Old collection deleted.")
+except Exception:
+    print("No existing collection found. Creating new.")
+
+collection = chroma_client.create_collection(
     name="ops_knowledge"
 )
 
