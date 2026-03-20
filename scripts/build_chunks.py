@@ -28,34 +28,31 @@ def clean_text(text):
 def chunk_text(text, chunk_size=500, overlap=100):
     text = clean_text(text)
     
-    # 1. Refined Splitter: 
-    # - ONLY splits at "To Find/Get" or numbered headings (1.1, 2., etc.)
-    # - Removed the generic [A-Z]{5,} which was accidentally catching 'SELECT'
-    heading_pattern = r'(?im)^(?=\s*(?:To\s+(?:Find|Get)|\d+(?:\.\d+)*\s+[A-Z]))'
+    # Updated Splitter: 
+    # 1. Added Q\d+:? to match Q1:, Q2:, etc.
+    # 2. Kept your existing To Find/Get and numbered heading logic.
+    heading_pattern = r'(?im)^(?=\s*(?:Q\d+:?|To\s+(?:Find|Get)|\d+(?:\.\d+)*\s+[A-Z]))'
     
     sections = re.split(heading_pattern, text)
     
     final_chunks = []
-    
     for section in sections:
         section = section.strip()
         if not section:
             continue
             
-        # 2. Protection Rule:
-        # If the section contains a query (SELECT) and an instruction (To Find/Get),
-        # we treat it as a single block and do NOT split it by character count.
-        # This keeps the heading and the query in the same chunk.
-        is_sql_block = "SELECT" in section.upper() and ("TO GET" in section.upper() or "TO FIND" in section.upper())
+        # Protection Rule: Keep SQL and FAQs as single blocks
+        is_protected_block = (
+            ("SELECT" in section.upper() and ("TO GET" in section.upper() or "TO FIND" in section.upper())) or
+            re.match(r'^Q\d+', section, re.IGNORECASE) # Protect FAQ chunks
+        )
         
-        if is_sql_block:
+        if is_protected_block:
             final_chunks.append(section)
-            
-        # 3. Standard Logic for non-SQL text (like manuals or descriptions)
         elif len(section) <= chunk_size:
             final_chunks.append(section)
         else:
-            # Only split if it's a long descriptive paragraph
+            # Standard paragraph fallback for other long text
             paragraphs = section.split("\n")
             current_chunk = ""
             for para in paragraphs:

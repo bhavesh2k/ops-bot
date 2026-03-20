@@ -39,7 +39,8 @@ Rules:
 3. If a SQL query exists that answers the question, return the SQL query EXACTLY as written.
 4. Do NOT modify SQL queries.
 5. Do NOT invent information.
-6. If the answer cannot be found in the documentation, say:
+6. If one chunk answers the question, just use that. DO NOT combine chunks.
+7. If the answer cannot be found in the documentation, say:
 "I could not find this information in the documentation."
 
 Important:
