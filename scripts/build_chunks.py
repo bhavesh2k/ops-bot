@@ -23,7 +23,18 @@ def clean_text(text):
     # Replace multiple spaces/tabs with single space
     text = re.sub(r'[ \t]+', ' ', text)
 
+    # Replace more than 5 dots with a single dot
+    text = re.sub(r'\.{5,}', '.', text)
+
+    # Replace non-breaking spaces with space
+    text = text.replace('\xa0', ' ')
+
     return text.strip()
+
+# for split paragraphs > 500 chars due to exception 
+def force_split(chunk, max_len=500):
+    return [chunk[i:i+max_len] for i in range(0, len(chunk), max_len)]
+
 
 def chunk_text(text, chunk_size=500, overlap=100):
     text = clean_text(text)
@@ -31,7 +42,8 @@ def chunk_text(text, chunk_size=500, overlap=100):
     # Updated Splitter: 
     # 1. Added Q\d+:? to match Q1:, Q2:, etc.
     # 2. Kept your existing To Find/Get and numbered heading logic.
-    heading_pattern = r'(?im)^(?=\s*(?:Q\d+:?|To\s+(?:Find|Get)|\d+(?:\.\d+)*\s+[A-Z]))'
+    #heading_pattern = r'(?im)^(?=\s*(?:Q\d+:?|To\s+(?:Find|Get)|\d+(?:\.\d+)*\s+[A-Z]))'
+    heading_pattern = r'(?im)^(?=\s*(?:Q\d+:?|To\s+(?:Find|Get)|\d+(?:\.\d+)*\.?[\s\xa0]+[A-Z]))'
     
     sections = re.split(heading_pattern, text)
     
@@ -53,19 +65,37 @@ def chunk_text(text, chunk_size=500, overlap=100):
             final_chunks.append(section)
         else:
             # Standard paragraph fallback for other long text
-            paragraphs = section.split("\n")
+            paragraphs = re.split(r'\n{1,}', section)
             current_chunk = ""
+
             for para in paragraphs:
                 if len(current_chunk) + len(para) < chunk_size:
                     current_chunk += (para + "\n")
                 else:
                     if current_chunk.strip():
-                        final_chunks.append(current_chunk.strip())
+                        # 🔴 APPLY FIX 2 HERE
+                        if len(current_chunk) > chunk_size:
+                            final_chunks.extend(force_split(current_chunk.strip(), chunk_size))
+                        else:
+                            final_chunks.append(current_chunk.strip())
                     current_chunk = (para + "\n")
+
             if current_chunk.strip():
-                final_chunks.append(current_chunk.strip())
-                
-    return final_chunks
+                # 🔴 APPLY FIX 2 HERE
+                if len(current_chunk) > chunk_size:
+                    final_chunks.extend(force_split(current_chunk.strip(), chunk_size))
+                else:
+                    final_chunks.append(current_chunk.strip())
+
+    # 🔴 FINAL SAFETY NET (this is what you're missing)
+    final_output = []
+    for chunk in final_chunks:
+        if len(chunk) > chunk_size:
+            final_output.extend(force_split(chunk, chunk_size))
+        else:
+            final_output.append(chunk)
+
+    return final_output
 
 
 def build_knowledge_chunks():

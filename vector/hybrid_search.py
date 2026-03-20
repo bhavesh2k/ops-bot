@@ -104,8 +104,11 @@ def hybrid_search(query, k=5, retrieval_k=25):
     # Sort final results
     final_results.sort(key=lambda x: x[1], reverse=True)
 
+    for i, ((text, source), score) in enumerate(final_results[:k]):
+        print(f"\n--- Chunk {i+1} ---")
+        print(f"Score: {score:.3f}")
+        print(f"Source: {source}")
+        print(text)
 
     # Return top-k directly (NO threshold)
-    print(final_results[:k])
-
     return [(doc, src) for (doc, src), score in final_results[:k]]
