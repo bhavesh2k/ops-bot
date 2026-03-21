@@ -39,9 +39,7 @@ def force_split(chunk, max_len=500):
 def chunk_text(text, chunk_size=500, overlap=100):
     text = clean_text(text)
     
-    # Updated Splitter: 
-    # 1. Added Q\d+:? to match Q1:, Q2:, etc.
-    # 2. Kept your existing To Find/Get and numbered heading logic.
+    # split based on this regex
     #heading_pattern = r'(?im)^(?=\s*(?:Q\d+:?|To\s+(?:Find|Get)|\d+(?:\.\d+)*\s+[A-Z]))'
     heading_pattern = r'(?im)^(?=\s*(?:Q\d+:?|To\s+(?:Find|Get)|\d+(?:\.\d+)*\.?[\s\xa0]+[A-Z]))'
     
@@ -69,25 +67,39 @@ def chunk_text(text, chunk_size=500, overlap=100):
             current_chunk = ""
 
             for para in paragraphs:
-                if len(current_chunk) + len(para) < chunk_size:
-                    current_chunk += (para + "\n")
+                para = para.strip()
+                if not para:
+                    continue
+
+                if len(current_chunk) + len(para) + 1 <= chunk_size:
+                    current_chunk += para + "\n"
                 else:
                     if current_chunk.strip():
-                        # 🔴 APPLY FIX 2 HERE
-                        if len(current_chunk) > chunk_size:
-                            final_chunks.extend(force_split(current_chunk.strip(), chunk_size))
+                        chunk_to_add = current_chunk.strip()
+
+                        # Add chunk
+                        if len(chunk_to_add) > chunk_size:
+                            split_chunks = force_split(chunk_to_add, chunk_size)
+                            final_chunks.extend(split_chunks)
+                            last_chunk = split_chunks[-1]
                         else:
-                            final_chunks.append(current_chunk.strip())
-                    current_chunk = (para + "\n")
+                            final_chunks.append(chunk_to_add)
+                            last_chunk = chunk_to_add
+
+                        # 🔴 APPLY OVERLAP HERE
+                        overlap_text = last_chunk[-overlap:] if overlap > 0 else ""
+                        current_chunk = overlap_text + "\n" + para + "\n"
+                    else:
+                        current_chunk = para + "\n"
 
             if current_chunk.strip():
-                # 🔴 APPLY FIX 2 HERE
-                if len(current_chunk) > chunk_size:
-                    final_chunks.extend(force_split(current_chunk.strip(), chunk_size))
+                chunk_to_add = current_chunk.strip()
+                if len(chunk_to_add) > chunk_size:
+                    final_chunks.extend(force_split(chunk_to_add, chunk_size))
                 else:
-                    final_chunks.append(current_chunk.strip())
+                    final_chunks.append(chunk_to_add)
 
-    # 🔴 FINAL SAFETY NET (this is what you're missing)
+    # final safety net to ensure chunks are < 500 chars
     final_output = []
     for chunk in final_chunks:
         if len(chunk) > chunk_size:

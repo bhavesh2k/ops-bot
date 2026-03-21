@@ -201,11 +201,11 @@ def generate_answer_stream_local(question):
     retrieval_end = time.perf_counter()
     retrieval_time = retrieval_end - retrieval_start
 
-    print("\nRetrieved Chunks:")
+    '''print("\nRetrieved Chunks:")
 
     for i, (doc, src) in enumerate(results):
         print(f"\n--- Chunk {i+1} | Source: {src} ---\n")
-        print(doc[:500])
+        print(doc[:500])'''
 
     # PROMPT BUILD TIMING
     prompt_start = time.perf_counter()
@@ -259,7 +259,6 @@ def generate_answer_stream_local(question):
 
     # PERFORMANCE SUMMARY
     print("\n\n---------------- PERFORMANCE ----------------")
-
     print(f"Retrieval time: {retrieval_time:.3f}s")
     print(f"Prompt build time: {prompt_time:.3f}s")
 
@@ -269,20 +268,15 @@ def generate_answer_stream_local(question):
     print(f"LLM total generation time: {llm_total_time:.3f}s")
 
     print(f"Total pipeline time: {total_end - total_start:.3f}s")
-
     print("--------------------------------------------\n")
 
 
-# --------------------------------------------------
 # CLI INTERFACE
-# --------------------------------------------------
-
 if __name__ == "__main__":
 
     print("Welcome to OneSpace Service Ops Assistant!\n")
 
     while True:
-
         question = input("Ask OneSpace Service Ops Assistant (type 'bye' to exit): ").strip()
 
         if question.lower() == "bye":
