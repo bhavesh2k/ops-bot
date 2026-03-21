@@ -3,6 +3,38 @@ const chat = document.getElementById("chat");
 const sourceList = document.getElementById("sourceList");
 const sendBtn = document.querySelector(".send-btn");
 
+
+function addCopyButtons(container) {
+  const blocks = container.querySelectorAll("pre");
+
+  blocks.forEach(block => {
+    // جلوگیری duplicate button
+    if (block.parentElement.classList.contains("code-wrapper")) return;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "code-wrapper";
+
+    const button = document.createElement("button");
+    button.className = "copy-btn";
+    button.innerText = "Copy";
+
+    button.onclick = () => {
+      const code = block.innerText;
+      navigator.clipboard.writeText(code);
+
+      button.innerText = "Copied!";
+      setTimeout(() => {
+        button.innerText = "Copy";
+      }, 1500);
+    };
+
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(button);
+    wrapper.appendChild(block);
+  });
+}
+
+
 /* ENTER KEY */
 input.addEventListener("keypress", function (event) {
   if (event.key === "Enter") {
@@ -119,6 +151,9 @@ async function sendQuestion() {
 
           // Render markdown live
           botBubble.innerHTML = marked.parse(fullResponse);
+          
+          // Add copy buttons after rendering markdown
+          addCopyButtons(botBubble);
         }
 
       } catch (e) {

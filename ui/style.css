@@ -241,6 +241,32 @@ body {
   fill: white;
 }
 
+/* Code Block Wrapper */
+.code-wrapper {
+  position: relative;
+}
+
+/* Copy Button */
+.copy-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #374151;
+  color: #e5e7eb;
+  border: none;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: 0.2s;
+}
+
+.copy-btn:hover {
+  opacity: 1;
+  background: #4b5563;
+}
+
 /* Footer */
 .footer {
   text-align: center;
