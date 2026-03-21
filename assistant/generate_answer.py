@@ -42,6 +42,10 @@ Rules:
 6. If one chunk answers the question, just use that. DO NOT combine chunks.
 7. If the answer cannot be found in the documentation, say:
 "I could not find this information in the documentation."
+8. Format your response using Markdown.
+   - Use bullet points for steps
+   - Use ```sql blocks for SQL queries
+   - Use proper spacing and line breaks
 
 Important:
 If a SQL query appears in the documentation that answers the question, return that SQL query.

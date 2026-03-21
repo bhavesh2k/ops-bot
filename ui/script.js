@@ -15,6 +15,8 @@ sendBtn.addEventListener("click", sendQuestion);
 
 async function sendQuestion() {
 
+  let fullResponse = "";
+
   const question = input.value.trim();
   if (!question) return;
 
@@ -107,13 +109,16 @@ async function sendQuestion() {
         }
 
         if (event.type === "token") {
-          
-          // first token → clear "Thinking..."
+
           if (!hasReceivedFirstToken) {
             botBubble.innerHTML = "";
             hasReceivedFirstToken = true;
           }
-          botBubble.innerHTML += event.data;
+
+          fullResponse += event.data;
+
+          // Render markdown live
+          botBubble.innerHTML = marked.parse(fullResponse);
         }
 
       } catch (e) {

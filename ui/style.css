@@ -155,6 +155,35 @@ body {
   word-wrap: break-word;
 }
 
+/* Markdown Styling */
+
+.bubble pre {
+  background: #1e1e1e;
+  color: #e5e7eb;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.bubble code {
+  font-family: Consolas, monospace;
+}
+
+.bubble p {
+  margin: 6px 0;
+}
+
+.bubble ul {
+  padding-left: 20px;
+  margin: 6px 0;
+}
+
+.bubble li {
+  margin-bottom: 4px;
+}
+
 /* Input Area */
 .chat-input {
   padding: 0px 30px 10px;
